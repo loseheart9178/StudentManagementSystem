@@ -1,0 +1,44 @@
+# 可执行文件和编译产物
+*.exe
+*.out
+*.obj
+*.o
+*.a
+*.so
+*.dll
+*.dSYM/
+
+# 编辑器和IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.log
+*.tmp
+
+# 编译器生成的文件
+*.i
+*.s
+
+# 调试文件
+*.gdb
+*.stackdump
+
+# 构建目录
+build/
+bin/
+lib/
+*.lib
+
+# 操作系统生成的文件
+.DS_Store
+Thumbs.db
+
+# 环境变量和配置
+.env
+.env.local
+*.env
+
+# 日志文件
+*.log
