@@ -10,9 +10,10 @@
 #define NAME_LEN 50   // 姓名长度上限
 #define POS_X1 35
 #define POS_X2 40
-#define POS_X3 50
+#define POS_X3 5011
 #define POS_X4 65
 #define POS_Y1 3
+#define DATA_FILE "studentInfo.txt"
 
 // 结构体定义
 
@@ -29,6 +30,7 @@ typedef struct student
 // 函数声明
 int Menu();                                                                                 // 菜单函数
 void SetPosition(int x, int y);                                                             // 设置光标位置函数
+void ClearInputBuffer(void);                                                                 // 清空输入缓冲区函数
 void InputRecord(int *stuNums, int *courseNums, STU stu[]);                                 // 输入学生信息函数
 void AppendRecord(int *stuNums, int courseNums, STU stu[]);                                 // 追加学生信息函数
 void DeleteRecord(int *stuNums, int courseNums, STU stu[]);                                 // 删除学生信息函数
@@ -158,11 +160,13 @@ int main()
             {
                 SetPosition(POS_X3, POS_Y1);
                 printf("请先输入学生信息！");
+                ClearInputBuffer();
                 getch();
                 break;
             }
 
             SortByNum(stuNums, courseNums, stu);
+            ClearInputBuffer();
             getch();
             break;
         case 10:
@@ -171,6 +175,7 @@ int main()
             {
                 SetPosition(POS_X3, POS_Y1);
                 printf("请先输入学生信息！");
+                ClearInputBuffer();
                 getch();
                 break;
             }
@@ -183,10 +188,12 @@ int main()
             {
                 SetPosition(POS_X3, POS_Y1);
                 printf("请先输入学生信息！");
+                ClearInputBuffer();
                 getch();
                 break;
             }
             SortByScore(stuNums, courseNums, stu, Decending);
+            ClearInputBuffer();
             getch();
             break;
         case 12:
@@ -195,11 +202,13 @@ int main()
             {
                 SetPosition(POS_X3, POS_Y1);
                 printf("请先输入学生信息！");
+                ClearInputBuffer();
                 getch();
                 break;
             }
 
             SortByScore(stuNums, courseNums, stu, Accending);
+            ClearInputBuffer();
             getch();
             break;
         case 13:
@@ -319,8 +328,10 @@ int Menu()
     }
     // 提示用户输入功能编号
     SetPosition(POS_X1, ++posy);
-    printf("请输入功能编号[0-16]:[]\b\b\b");
+    printf("请输入功能编号[0-16]: ");
+    fflush(stdout);
     scanf("%d", &choice);
+    ClearInputBuffer();
     return choice;
 }
 
@@ -334,6 +345,14 @@ void SetPosition(int x, int y)
     pos.Y = y;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
+
+void ClearInputBuffer(void)
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
+}
+
 void InputRecord(int *stuNums, int *courseNums, STU stu[])
 {
     int i, j;
@@ -341,9 +360,11 @@ void InputRecord(int *stuNums, int *courseNums, STU stu[])
     SetPosition(POS_X2, posy);
     printf("请输入学生人数(stuNums<%d):", STU_NUM);
     scanf("%d", stuNums);
+    ClearInputBuffer();
     SetPosition(POS_X2, posy += 2);
     printf("请输入课程数量(courseNums<%d):", COURSE_NUM);
     scanf("%d", courseNums);
+    ClearInputBuffer();
     if (*stuNums <= 0 || *stuNums > STU_NUM)
     {
         printf("\n学生人数输入无效！");
@@ -376,6 +397,7 @@ void InputRecord(int *stuNums, int *courseNums, STU stu[])
         {
             scanf("%f", &stu[i].score[j]);
         }
+        ClearInputBuffer();
     }
 }
 
@@ -387,6 +409,7 @@ void AppendRecord(int *stuNums, int courseNums, STU stu[])
     int start_index;
     printf("请输入要追加的学生人数:");
     scanf("%d", &num_record);
+    ClearInputBuffer();
     if (num_record <= 0)
     {
         printf("追加人数输入无效！");
@@ -408,6 +431,7 @@ void AppendRecord(int *stuNums, int courseNums, STU stu[])
         {
             scanf("%f", &stu[i].score[j]);
         }
+        ClearInputBuffer();
     }
     *stuNums += num_record;
     printf("追加成功！");
@@ -421,6 +445,7 @@ void DeleteRecord(int *stuNums, int courseNums, STU stu[])
     char ch;
     printf("请输入要删除的学生学号：");
     scanf("%ld", &id);
+    ClearInputBuffer();
     for (i = 0; i < *stuNums; i++)
     {
         if (stu[i].num == id)
@@ -433,8 +458,9 @@ void DeleteRecord(int *stuNums, int courseNums, STU stu[])
             }
             printf("%10.2f%10.2f\n", stu[i].sum, stu[i].aver);
             printf("是否确认删除该学生信息？(Y/y或N/n):");
-            getchar(); // 吸收掉上一个输入留下的换行符
+            ClearInputBuffer(); // 吸收多余输入
             scanf("%c", &ch);
+            ClearInputBuffer();
             if (ch == 'Y' || ch == 'y')
             {
                 for (j = i; j < *stuNums - 1; j++)
@@ -465,6 +491,7 @@ void SearchByNum(int stuNums, int courseNums, STU stu[])
     int i, j;
     printf("请输入要查询的学号：");
     scanf("%ld", &id);
+    ClearInputBuffer();
     for (i = 0; i < stuNums; i++)
     {
         if (stu[i].num == id)
@@ -490,6 +517,7 @@ void SearchByName(int stuNums, int courseNums, STU stu[])
     char name[NAME_LEN];
     printf("请输入要查询学生的姓名：");
     scanf("%s", name);
+    ClearInputBuffer();
     for (i = 0; i < stuNums; i++)
     {
         if (strcmp(stu[i].name, name) == 0)
@@ -518,6 +546,7 @@ void ModifyRecord(int stuNums, int courseNums, STU stu[])
     char ch;
     printf("请输入要修改的学生学号：");
     scanf("%ld", &id);
+    ClearInputBuffer();
     for (i = 0; i < stuNums; i++)
     {
         if (stu[i].num == id)
@@ -530,8 +559,9 @@ void ModifyRecord(int stuNums, int courseNums, STU stu[])
             }
             printf("%10.2f%10.2f\n", stu[i].sum, stu[i].aver);
             printf("是否确认修改该学生信息？(Y/y或N/n):");
-            getchar(); // 吸收掉上一个输入留下的换行符
+            ClearInputBuffer(); // 吸收多余输入
             scanf("%c", &ch);
+            ClearInputBuffer();
             if (ch == 'Y' || ch == 'y')
             {
                 printf("请输入新的学生姓名：");
@@ -747,10 +777,10 @@ void WriteToFile(int stuNums, int courseNums, STU stu[])
 {
     int i, j;
     FILE *fp;
-    fp = fopen("C:\\Users\\loseheart\\Desktop\\StudentManagementSystem\\data\\studentInfo", "w");
+    fp = fopen(DATA_FILE, "w");
     if (fp == NULL)
     {
-        printf("无法打开文件，写入失败！");
+        printf("无法打开文件，写入失败！请检查当前目录是否可写。");
         return;
     }
 
@@ -775,9 +805,9 @@ int ReadFromFile(int *stuNums, int *courseNums, STU stu[], int *first)
     int i, j;
     int posy = 8;
     SetPosition(POS_X1, posy);
-    if ((fp = fopen("C:\\Users\\loseheart\\Desktop\\StudentManagementSystem\\data\\studentInfo", "r")) == NULL)
+    if ((fp = fopen(DATA_FILE, "r")) == NULL)
     {
-        printf("无法打开文件，读取失败！");
+        printf("无法打开文件，读取失败！请确认文件已存在。");
         return 1;
     }
     fscanf(fp, "%10ld%10ld", stuNums, courseNums);
