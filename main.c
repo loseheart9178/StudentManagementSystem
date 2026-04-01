@@ -10,14 +10,12 @@
 #define NAME_LEN 50   // 姓名长度上限
 #define POS_X1 35
 #define POS_X2 40
-#define POS_X3 5011
+#define POS_X3 50
 #define POS_X4 65
 #define POS_Y1 3
 #define DATA_FILE "studentInfo.txt"
 
 // 结构体定义
-
-// 学生结构体
 typedef struct student
 {
     long num;                // 学号
@@ -27,37 +25,44 @@ typedef struct student
     float aver;              // 平均分
 } STU;
 
+// 链表节点结构体
+typedef struct node
+{
+    STU data;
+    struct node *next;
+} NODE;
+
 // 函数声明
-int Menu();                                                                                 // 菜单函数
-void SetPosition(int x, int y);                                                             // 设置光标位置函数
-void ClearInputBuffer(void);                                                                 // 清空输入缓冲区函数
-void InputRecord(int *stuNums, int *courseNums, STU stu[]);                                 // 输入学生信息函数
-void AppendRecord(int *stuNums, int courseNums, STU stu[]);                                 // 追加学生信息函数
-void DeleteRecord(int *stuNums, int courseNums, STU stu[]);                                 // 删除学生信息函数
-void SearchByNum(int stuNums, int courseNums, STU stu[]);                                   // 按学号查询学生信息函数
-void SearchByName(int stuNums, int courseNums, STU stu[]);                                  // 按姓名查询学生信息函数
-void ModifyRecord(int stuNums, int courseNums, STU stu[]);                                  // 修改学生信息函数
-void CalculateScoreOfStudent(int stuNums, int courseNums, STU stu[]);                       // 计算学生成绩函数
-void CalculateScoreOfCourse(int stuNums, int courseNums, STU stu[]);                        // 计算课程成绩函数
-void SortByNum(int stuNums, int courseNums, STU stu[]);                                     // 按学号排序函数
-void SortByName(int stuNums, int courseNums, STU stu[]);                                    // 按姓名排序函数
-void SortByScore(int stuNums, int courseNums, STU stu[], int (*compare)(float a, float b)); // 按总分排序函数
-int Accending(float a, float b);                                                            // 升序比较函数
-int Decending(float a, float b);                                                            // 降序比较函数
-void StatisticAnalysis(int stuNums, int courseNums, STU stu[]);                             // 统计分析函数
-void PrintRecord(int stuNums, int courseNums, STU stu[]);                                   // 打印学生信息函数
-void WriteToFile(int stuNums, int courseNums, STU stu[]);                                   // 将学生信息写入文件函数
-int ReadFromFile(int *stuNums, int *courseNums, STU stu[], int *first);                     // 从文件读取学生信息函数
+int Menu();                                                       // 菜单函数
+void SetPosition(int x, int y);                                   // 设置光标位置函数
+void ClearInputBuffer(void);                                      // 清空输入缓冲区函数
+void InputRecord(int *stuNums, int *courseNums, NODE **head);     // 输入学生信息函数
+void AppendRecord(int *stuNums, int courseNums, NODE **head);     // 追加学生信息函数
+void DeleteRecord(int *stuNums, int courseNums, NODE **head);     // 删除学生信息函数
+void SearchByNum(int stuNums, int courseNums, NODE *head);        // 按学号查询学生信息函数
+void SearchByName(int stuNums, int courseNums, NODE *head);       // 按姓名查询学生信息函数
+void ModifyRecord(int stuNums, int courseNums, NODE *head);       // 修改学生信息函数
+void CalculateScoreOfStudent(int stuNums, int courseNums, NODE *head); // 计算学生成绩函数
+void CalculateScoreOfCourse(int stuNums, int courseNums, NODE *head);  // 计算课程成绩函数
+void SortByNum(int stuNums, int courseNums, NODE **head);          // 按学号排序函数
+void SortByName(int stuNums, int courseNums, NODE **head);         // 按姓名排序函数
+void SortByScore(int stuNums, int courseNums, NODE **head, int (*compare)(float a, float b)); // 按总分排序函数
+int Accending(float a, float b);                                  // 升序比较函数
+int Decending(float a, float b);                                  // 降序比较函数
+void StatisticAnalysis(int stuNums, int courseNums, NODE *head);   // 统计分析函数
+void PrintRecord(int stuNums, int courseNums, NODE *head);         // 打印学生信息函数
+void WriteToFile(int stuNums, int courseNums, NODE *head);         // 将学生信息写入文件函数
+int ReadFromFile(int *stuNums, int *courseNums, NODE **head, int *first); // 从文件读取学生信息函数
+void FreeList(NODE *head);                                         // 释放链表内存函数
 
 // 主函数入口
 int main()
 {
     int stuNums = 0;
     int courseNums = 0;
-    int i, j;
     int choice;
     int first = 1;    // 标志变量，表示是否第一次运行程序
-    STU stu[STU_NUM]; // 学生数组
+    NODE *head = NULL; // 链表头指针
 
     system("chcp 65001 > nul");            // 设置控制台编码为 UTF-8，解决中文乱码问题
     system("mode con: cols=130 lines=60"); // 设置控制台窗口大小
@@ -70,7 +75,7 @@ int main()
         {
         case 1:
             system("cls");
-            InputRecord(&stuNums, &courseNums, stu);
+            InputRecord(&stuNums, &courseNums, &head);
             first = 0; // 已经输入过学生信息，设置标志变量为0
             system("pause");
             break;
@@ -82,7 +87,7 @@ int main()
                 system("pause");
                 break;
             }
-            AppendRecord(&stuNums, courseNums, stu);
+            AppendRecord(&stuNums, courseNums, &head);
             system("pause");
             break;
         case 3:
@@ -93,8 +98,7 @@ int main()
                 system("pause");
                 break;
             }
-
-            DeleteRecord(&stuNums, courseNums, stu);
+            DeleteRecord(&stuNums, courseNums, &head);
             system("pause");
             break;
         case 4:
@@ -105,8 +109,7 @@ int main()
                 system("pause");
                 break;
             }
-
-            SearchByNum(stuNums, courseNums, stu);
+            SearchByNum(stuNums, courseNums, head);
             system("pause");
             break;
         case 5:
@@ -117,7 +120,7 @@ int main()
                 system("pause");
                 break;
             }
-            SearchByName(stuNums, courseNums, stu);
+            SearchByName(stuNums, courseNums, head);
             system("pause");
             break;
         case 6:
@@ -128,8 +131,7 @@ int main()
                 system("pause");
                 break;
             }
-
-            ModifyRecord(stuNums, courseNums, stu);
+            ModifyRecord(stuNums, courseNums, head);
             system("pause");
             break;
         case 7:
@@ -140,7 +142,7 @@ int main()
                 system("pause");
                 break;
             }
-            CalculateScoreOfStudent(stuNums, courseNums, stu);
+            CalculateScoreOfStudent(stuNums, courseNums, head);
             system("pause");
             break;
         case 8:
@@ -151,7 +153,7 @@ int main()
                 system("pause");
                 break;
             }
-            CalculateScoreOfCourse(stuNums, courseNums, stu);
+            CalculateScoreOfCourse(stuNums, courseNums, head);
             system("pause");
             break;
         case 9:
@@ -164,8 +166,7 @@ int main()
                 getch();
                 break;
             }
-
-            SortByNum(stuNums, courseNums, stu);
+            SortByNum(stuNums, courseNums, &head);
             ClearInputBuffer();
             getch();
             break;
@@ -179,7 +180,7 @@ int main()
                 getch();
                 break;
             }
-            SortByName(stuNums, courseNums, stu);
+            SortByName(stuNums, courseNums, &head);
             system("pause");
             break;
         case 11:
@@ -192,7 +193,7 @@ int main()
                 getch();
                 break;
             }
-            SortByScore(stuNums, courseNums, stu, Decending);
+            SortByScore(stuNums, courseNums, &head, Decending);
             ClearInputBuffer();
             getch();
             break;
@@ -206,26 +207,25 @@ int main()
                 getch();
                 break;
             }
-
-            SortByScore(stuNums, courseNums, stu, Accending);
+            SortByScore(stuNums, courseNums, &head, Accending);
             ClearInputBuffer();
             getch();
             break;
         case 13:
             system("cls");
-                if (first)
-                {
-                    SetPosition(POS_X3, POS_Y1);
-                    printf("请先输入学生信息！");
-                    system("pause");
-                    break;
-                }
-            StatisticAnalysis(stuNums, courseNums, stu);
+            if (first)
+            {
+                SetPosition(POS_X3, POS_Y1);
+                printf("请先输入学生信息！");
+                system("pause");
+                break;
+            }
+            StatisticAnalysis(stuNums, courseNums, head);
             system("pause");
             break;
         case 14:
             system("cls");
-            PrintRecord(stuNums, courseNums, stu);
+            PrintRecord(stuNums, courseNums, head);
             system("pause");
             break;
         case 15:
@@ -237,12 +237,12 @@ int main()
                 system("pause");
                 break;
             }
-            WriteToFile(stuNums, courseNums, stu);
+            WriteToFile(stuNums, courseNums, head);
             system("pause");
             break;
         case 16:
             system("cls");
-            if (ReadFromFile(&stuNums, &courseNums, stu, &first))
+            if (ReadFromFile(&stuNums, &courseNums, &head, &first))
             {
                 SetPosition(POS_X1, 10);
                 printf("请先输入学生信息！");
@@ -256,6 +256,7 @@ int main()
             SetPosition(POS_X3, 10);
             printf("感谢使用学生成绩管理系统，再见！");
             printf("\n");
+            FreeList(head); // 释放链表内存
             exit(0);
             break;
         default:
@@ -271,7 +272,6 @@ int Menu()
 {
     int posy = 5;
     int choice;
-    int i, j;
     SetPosition(POS_X3, posy);
     printf("学生成绩管理系统");
     for (int i = 0; i < 2; i++)
@@ -337,7 +337,6 @@ int Menu()
 
 void SetPosition(int x, int y)
 {
-
     HANDLE hOut;
     COORD pos;
     hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -353,7 +352,8 @@ void ClearInputBuffer(void)
         ;
 }
 
-void InputRecord(int *stuNums, int *courseNums, STU stu[])
+// 输入学生信息，创建链表
+void InputRecord(int *stuNums, int *courseNums, NODE **head)
 {
     int i, j;
     int posy = 6;
@@ -379,6 +379,11 @@ void InputRecord(int *stuNums, int *courseNums, STU stu[])
         *courseNums = 0;
         return;
     }
+    // 清空原有链表
+    FreeList(*head);
+    *head = NULL;
+    NODE *tail = NULL;
+
     for (int i = 0; i < 2; i++)
     {
         SetPosition(POS_X1, ++posy);
@@ -391,22 +396,46 @@ void InputRecord(int *stuNums, int *courseNums, STU stu[])
     printf("请依次输入学生的学号、姓名和%d门课程的成绩:", *courseNums);
     for (i = 0; i < *stuNums; i++)
     {
+        NODE *newNode = (NODE *)malloc(sizeof(NODE));
+        if (!newNode)
+        {
+            printf("内存分配失败！\n");
+            exit(1);
+        }
         printf("请输入第%d个学生信息:\t", i + 1);
-        scanf("%ld%s", &stu[i].num, stu[i].name);
+        scanf("%ld%s", &newNode->data.num, newNode->data.name);
         for (j = 0; j < *courseNums; j++)
         {
-            scanf("%f", &stu[i].score[j]);
+            scanf("%f", &newNode->data.score[j]);
         }
         ClearInputBuffer();
+        newNode->data.sum = 0;   // 后续计算
+        newNode->data.aver = 0;  // 后续计算
+        newNode->next = NULL;
+        if (*head == NULL)
+        {
+            *head = newNode;
+            tail = newNode;
+        }
+        else
+        {
+            tail->next = newNode;
+            tail = newNode;
+        }
     }
 }
 
 // 追加学生信息
-void AppendRecord(int *stuNums, int courseNums, STU stu[])
+void AppendRecord(int *stuNums, int courseNums, NODE **head)
 {
     int i, j;
     int num_record;
-    int start_index;
+    if (*stuNums + num_record > STU_NUM)
+    {
+        SetPosition(POS_X2, 12);
+        printf("要增加的记录条数太多，请重新输入:");
+        return;
+    }
     printf("请输入要追加的学生人数:");
     scanf("%d", &num_record);
     ClearInputBuffer();
@@ -415,58 +444,75 @@ void AppendRecord(int *stuNums, int courseNums, STU stu[])
         printf("追加人数输入无效！");
         return;
     }
-    if (*stuNums + num_record > STU_NUM)
+    // 找到尾节点
+    NODE *tail = *head;
+    if (tail)
     {
-        SetPosition(POS_X2, 12);
-        printf("要增加的记录条数太多，请重新输入:");
-        return;
+        while (tail->next)
+            tail = tail->next;
     }
-    start_index = *stuNums;
-    for (i = start_index; i < start_index + num_record; i++)
+    for (i = 0; i < num_record; i++)
     {
+        NODE *newNode = (NODE *)malloc(sizeof(NODE));
+        if (!newNode)
+        {
+            printf("内存分配失败！\n");
+            exit(1);
+        }
         SetPosition(POS_X2, 14 + i * 2);
-        printf("请输入第%d个学生信息:\t", i + 1);
-        scanf("%ld%s", &stu[i].num, stu[i].name);
+        printf("请输入第%d个学生信息:\t", *stuNums + i + 1);
+        scanf("%ld%s", &newNode->data.num, newNode->data.name);
         for (j = 0; j < courseNums; j++)
         {
-            scanf("%f", &stu[i].score[j]);
+            scanf("%f", &newNode->data.score[j]);
         }
         ClearInputBuffer();
+        newNode->data.sum = 0;
+        newNode->data.aver = 0;
+        newNode->next = NULL;
+        if (*head == NULL)
+        {
+            *head = newNode;
+            tail = newNode;
+        }
+        else
+        {
+            tail->next = newNode;
+            tail = newNode;
+        }
     }
     *stuNums += num_record;
     printf("追加成功！");
 }
 
 // 删除学生信息
-void DeleteRecord(int *stuNums, int courseNums, STU stu[])
+void DeleteRecord(int *stuNums, int courseNums, NODE **head)
 {
-    int i, j;
     long id;
     char ch;
     printf("请输入要删除的学生学号：");
     scanf("%ld", &id);
     ClearInputBuffer();
-    for (i = 0; i < *stuNums; i++)
+    NODE *prev = NULL, *curr = *head;
+    while (curr)
     {
-        if (stu[i].num == id)
+        if (curr->data.num == id)
         {
             printf("找到了，该学号对应的学生信息如下：\n");
-            printf("%10ld%15s", stu[i].num, stu[i].name);
-            for (j = 0; j < courseNums; j++)
-            {
-                printf("%10.2f", stu[i].score[j]);
-            }
-            printf("%10.2f%10.2f\n", stu[i].sum, stu[i].aver);
+            printf("%10ld%15s", curr->data.num, curr->data.name);
+            for (int j = 0; j < courseNums; j++)
+                printf("%10.2f", curr->data.score[j]);
+            printf("%10.2f%10.2f\n", curr->data.sum, curr->data.aver);
             printf("是否确认删除该学生信息？(Y/y或N/n):");
-            ClearInputBuffer(); // 吸收多余输入
             scanf("%c", &ch);
             ClearInputBuffer();
             if (ch == 'Y' || ch == 'y')
             {
-                for (j = i; j < *stuNums - 1; j++)
-                {
-                    stu[j] = stu[j + 1];
-                }
+                if (prev == NULL)
+                    *head = curr->next;
+                else
+                    prev->next = curr->next;
+                free(curr);
                 (*stuNums)--;
                 printf("学号为%ld的学生已删除!\n", id);
             }
@@ -480,96 +526,92 @@ void DeleteRecord(int *stuNums, int courseNums, STU stu[])
             }
             return;
         }
+        prev = curr;
+        curr = curr->next;
     }
     printf("未找到学号为%ld的学生!\n", id);
 }
 
-// 按学号查询学生信息
-void SearchByNum(int stuNums, int courseNums, STU stu[])
+// 按学号查询
+void SearchByNum(int stuNums, int courseNums, NODE *head)
 {
     long id;
-    int i, j;
     printf("请输入要查询的学号：");
     scanf("%ld", &id);
     ClearInputBuffer();
-    for (i = 0; i < stuNums; i++)
+    NODE *p = head;
+    while (p)
     {
-        if (stu[i].num == id)
+        if (p->data.num == id)
         {
             printf("找到了，该学号对应的学生信息如下：\n");
-            printf("%10ld%15s", stu[i].num, stu[i].name);
-            for (j = 0; j < courseNums; j++)
-            {
-                printf("%10.2f", stu[i].score[j]);
-            }
-            printf("%10.2f%10.2f\n", stu[i].sum, stu[i].aver);
+            printf("%10ld%15s", p->data.num, p->data.name);
+            for (int j = 0; j < courseNums; j++)
+                printf("%10.2f", p->data.score[j]);
+            printf("%10.2f%10.2f\n", p->data.sum, p->data.aver);
             return;
         }
+        p = p->next;
     }
     printf("未找到学号为%ld的学生!\n", id);
 }
-// 按姓名查询学生信息
-void SearchByName(int stuNums, int courseNums, STU stu[])
+
+// 按姓名查询
+void SearchByName(int stuNums, int courseNums, NODE *head)
 {
     int flag = 1;
-    int i, j;
     int k = 0;
     char name[NAME_LEN];
     printf("请输入要查询学生的姓名：");
     scanf("%s", name);
     ClearInputBuffer();
-    for (i = 0; i < stuNums; i++)
+    NODE *p = head;
+    while (p)
     {
-        if (strcmp(stu[i].name, name) == 0)
+        if (strcmp(p->data.name, name) == 0)
         {
             printf("找到了，第%d个对应的学生信息如下：\n", ++k);
-            printf("%10ld%15s", stu[i].num, stu[i].name);
-            for (j = 0; j < courseNums; j++)
-            {
-                printf("%10.2f", stu[i].score[j]);
-            }
-            printf("%10.2f%10.2f\n", stu[i].sum, stu[i].aver);
+            printf("%10ld%15s", p->data.num, p->data.name);
+            for (int j = 0; j < courseNums; j++)
+                printf("%10.2f", p->data.score[j]);
+            printf("%10.2f%10.2f\n", p->data.sum, p->data.aver);
             flag = 0;
         }
+        p = p->next;
     }
     if (flag)
-    {
         printf("未找到姓名为%s的学生!\n", name);
-    }
 }
 
 // 修改学生信息
-void ModifyRecord(int stuNums, int courseNums, STU stu[])
+void ModifyRecord(int stuNums, int courseNums, NODE *head)
 {
-    int i, j;
     long id;
     char ch;
     printf("请输入要修改的学生学号：");
     scanf("%ld", &id);
     ClearInputBuffer();
-    for (i = 0; i < stuNums; i++)
+    NODE *p = head;
+    while (p)
     {
-        if (stu[i].num == id)
+        if (p->data.num == id)
         {
             printf("找到了，该学号对应的学生信息如下：\n");
-            printf("%10ld%15s", stu[i].num, stu[i].name);
-            for (j = 0; j < courseNums; j++)
-            {
-                printf("%10.2f", stu[i].score[j]);
-            }
-            printf("%10.2f%10.2f\n", stu[i].sum, stu[i].aver);
+            printf("%10ld%15s", p->data.num, p->data.name);
+            for (int j = 0; j < courseNums; j++)
+                printf("%10.2f", p->data.score[j]);
+            printf("%10.2f%10.2f\n", p->data.sum, p->data.aver);
             printf("是否确认修改该学生信息？(Y/y或N/n):");
-            ClearInputBuffer(); // 吸收多余输入
             scanf("%c", &ch);
             ClearInputBuffer();
             if (ch == 'Y' || ch == 'y')
             {
                 printf("请输入新的学生姓名：");
-                scanf("%s", stu[i].name);
-                for (j = 0; j < courseNums; j++)
+                scanf("%s", p->data.name);
+                for (int j = 0; j < courseNums; j++)
                 {
                     printf("请输入新的课程%d成绩：", j + 1);
-                    scanf("%f", &stu[i].score[j]);
+                    scanf("%f", &p->data.score[j]);
                 }
                 printf("学号为%ld的学生信息已修改!\n", id);
             }
@@ -583,75 +625,86 @@ void ModifyRecord(int stuNums, int courseNums, STU stu[])
             }
             return;
         }
+        p = p->next;
     }
     printf("未找到学号为%ld的学生!\n", id);
 }
 
 // 计算每个学生的总分和平均分
-void CalculateScoreOfStudent(int stuNums, int courseNums, STU stu[])
+void CalculateScoreOfStudent(int stuNums, int courseNums, NODE *head)
 {
-    int i, j;
-    float sum;
     if (courseNums <= 0)
     {
         printf("课程数量无效，无法计算学生成绩！\n");
         return;
     }
     printf("每个学生的各门课程总分和平均分为：\n");
-    for (i = 0; i < stuNums; i++)
+    NODE *p = head;
+    int i = 1;
+    while (p)
     {
-        sum = 0;
-        for (j = 0; j < courseNums; j++)
-        {
-            sum += stu[i].score[j];
-        }
-        stu[i].sum = sum;
-        stu[i].aver = sum / courseNums;
-        printf("第%d个学生:总分 = %.2f:平均分 = %.2f\n", i + 1, stu[i].sum, stu[i].aver);
+        float sum = 0;
+        for (int j = 0; j < courseNums; j++)
+            sum += p->data.score[j];
+        p->data.sum = sum;
+        p->data.aver = sum / courseNums;
+        printf("第%d个学生:总分 = %.2f:平均分 = %.2f\n", i++, p->data.sum, p->data.aver);
+        p = p->next;
     }
 }
 
 // 计算每门课程的总分和平均分
-void CalculateScoreOfCourse(int stuNums, int courseNums, STU stu[])
+void CalculateScoreOfCourse(int stuNums, int courseNums, NODE *head)
 {
-    int i, j;
-    float sum[COURSE_NUM], aver[COURSE_NUM];
     int posy = 7;
     if (stuNums <= 0 || courseNums <= 0)
     {
         printf("当前没有可计算的学生成绩数据！\n");
         return;
     }
+    float sum[COURSE_NUM] = {0};
+    float aver[COURSE_NUM];
+    NODE *p = head;
+    while (p)
+    {
+        for (int j = 0; j < courseNums; j++)
+            sum[j] += p->data.score[j];
+        p = p->next;
+    }
     SetPosition(POS_X1, posy);
     printf("各门课程总分和平均分计算结果：\n");
-    for (j = 0; j < courseNums; j++)
+    for (int j = 0; j < courseNums; j++)
     {
-        sum[j] = 0;
-        for (i = 0; i < stuNums; i++)
-        {
-            sum[j] += stu[i].score[j];
-        }
         aver[j] = sum[j] / stuNums;
         SetPosition(POS_X1, ++posy);
         printf("第%d门课：总分 = %.2f，平均分 = %.2f\n", j + 1, sum[j], aver[j]);
     }
 }
 
-// 按学号排序
-void SortByNum(int stuNums, int courseNums, STU stu[])
+// 按学号排序（交换节点数据）
+void SortByNum(int stuNums, int courseNums, NODE **head)
 {
-    int i, j;
-    STU temp;
-    // 升序排序
-    for (i = 0; i < stuNums - 1; i++)
+    if (!head || !*head || (*head)->next == NULL) return;
+    // 获取所有节点指针
+    NODE *arr[STU_NUM];
+    int count = 0;
+    NODE *p = *head;
+    while (p)
     {
-        for (j = i + 1; j < stuNums; j++)
+        arr[count++] = p;
+        p = p->next;
+    }
+    // 冒泡排序（按学号升序）
+    for (int i = 0; i < count - 1; i++)
+    {
+        for (int j = i + 1; j < count; j++)
         {
-            if (stu[i].num > stu[j].num)
+            if (arr[i]->data.num > arr[j]->data.num)
             {
-                temp = stu[i];
-                stu[i] = stu[j];
-                stu[j] = temp;
+                // 交换节点中的数据，不改变指针链接
+                STU temp = arr[i]->data;
+                arr[i]->data = arr[j]->data;
+                arr[j]->data = temp;
             }
         }
     }
@@ -660,19 +713,26 @@ void SortByNum(int stuNums, int courseNums, STU stu[])
 }
 
 // 按姓名排序
-void SortByName(int stuNums, int courseNums, STU stu[])
+void SortByName(int stuNums, int courseNums, NODE **head)
 {
-    int i, j;
-    STU temp;
-    for (i = 0; i < stuNums - 1; i++)
+    if (!head || !*head || (*head)->next == NULL) return;
+    NODE *arr[STU_NUM];
+    int count = 0;
+    NODE *p = *head;
+    while (p)
     {
-        for (j = i + 1; j < stuNums; j++)
+        arr[count++] = p;
+        p = p->next;
+    }
+    for (int i = 0; i < count - 1; i++)
+    {
+        for (int j = i + 1; j < count; j++)
         {
-            if (strcmp(stu[i].name, stu[j].name) > 0)
+            if (strcmp(arr[i]->data.name, arr[j]->data.name) > 0)
             {
-                temp = stu[i];
-                stu[i] = stu[j];
-                stu[j] = temp;
+                STU temp = arr[i]->data;
+                arr[i]->data = arr[j]->data;
+                arr[j]->data = temp;
             }
         }
     }
@@ -680,148 +740,165 @@ void SortByName(int stuNums, int courseNums, STU stu[])
     printf("按姓名升序排序完成！");
 }
 
-// 升序比较函数
-int Accending(float a, float b)
-{
-    return a < b;
-}
+int Accending(float a, float b) { return a < b; }
+int Decending(float a, float b) { return a > b; }
 
-// 降序比较函数
-int Decending(float a, float b)
+// 按总分排序（通过比较函数指定升/降序）
+void SortByScore(int stuNums, int courseNums, NODE **head, int (*compare)(float a, float b))
 {
-    return a > b;
-}
-
-// 按总分排序
-void SortByScore(int stuNums, int courseNums, STU stu[], int (*compare)(float a, float b))
-{
-    int i, j;
-    STU temp;
-    int k;
-    for (i = 0; i < stuNums - 1; i++)
+    if (!head || !*head || (*head)->next == NULL) return;
+    NODE *arr[STU_NUM];
+    int count = 0;
+    NODE *p = *head;
+    while (p)
     {
-        k = i;
-        for (j = i + 1; j < stuNums; j++)
+        arr[count++] = p;
+        p = p->next;
+    }
+    // 选择排序
+    for (int i = 0; i < count - 1; i++)
+    {
+        int k = i;
+        for (int j = i + 1; j < count; j++)
         {
-            if ((*compare)(stu[k].sum, stu[j].sum))
+            if (compare(arr[k]->data.sum, arr[j]->data.sum))
                 k = j;
         }
         if (k != i)
         {
-            temp = stu[i];
-            stu[i] = stu[k];
-            stu[k] = temp;
+            STU temp = arr[i]->data;
+            arr[i]->data = arr[k]->data;
+            arr[k]->data = temp;
         }
     }
 }
 
 // 统计分析成绩分布
-void StatisticAnalysis(int stuNums, int courseNums, STU stu[])
+void StatisticAnalysis(int stuNums, int courseNums, NODE *head)
 {
-    int i,j;
     int t[6];
-    for(j=0;j<courseNums;j++)
+    for (int j = 0; j < courseNums; j++)
     {
-        printf("\n课程%d成绩统计结果：\n",j+1);
+        printf("\n课程%d成绩统计结果：\n", j + 1);
         printf("分数段\t人数\t占比\n");
-        memset(t,0,sizeof(t));
-        for(i=0;i<stuNums;i++)
+        memset(t, 0, sizeof(t));
+        NODE *p = head;
+        while (p)
         {
-            if(stu[i].score[j]>=0&&stu[i].score[j]<60)
-            t[0]++;
-            else if(stu[i].score[j]>=60&&stu[i].score[j]<70)
-            t[1]++;
-            else if(stu[i].score[j]>=70&&stu[i].score[j]<80)
-            t[2]++;
-            else if(stu[i].score[j]>=80&&stu[i].score[j]<90)
-            t[3]++;
-            else if(stu[i].score[j]>=90&&stu[i].score[j]<100)  
-            t[4]++;
-            else if (stu[i].score[j] == 100)
-            t[5]++;
+            float score = p->data.score[j];
+            if (score >= 0 && score < 60) t[0]++;
+            else if (score >= 60 && score < 70) t[1]++;
+            else if (score >= 70 && score < 80) t[2]++;
+            else if (score >= 80 && score < 90) t[3]++;
+            else if (score >= 90 && score < 100) t[4]++;
+            else if (score == 100) t[5]++;
+            p = p->next;
         }
-        for(int i=0;i<6;i++){
-            if(i==0)
-            printf("<60\t%d\t%.2f%%\n",t[i],(float)t[i]/stuNums*100);
-            else if(i==5)
-            printf("100\t%d\t%.2f%%\n",t[i],(float)t[i]/stuNums*100);
+        for (int i = 0; i < 6; i++)
+        {
+            if (i == 0)
+                printf("<60\t%d\t%.2f%%\n", t[i], (float)t[i] / stuNums * 100);
+            else if (i == 5)
+                printf("100\t%d\t%.2f%%\n", t[i], (float)t[i] / stuNums * 100);
             else
-            printf("%d-%d\t%d\t%.2f%%\n",(i+5)*10,(i+5)*10+9,t[i],(float)t[i]/stuNums*100);
+                printf("%d-%d\t%d\t%.2f%%\n", (i + 5) * 10, (i + 5) * 10 + 9, t[i], (float)t[i] / stuNums * 100);
         }
     }
 }
 
 // 打印所有学生信息
-void PrintRecord(int stuNums, int courseNums, STU stu[])
-{  
-    int i, j;
+void PrintRecord(int stuNums, int courseNums, NODE *head)
+{
     printf("学号\t\t姓名\t\t");
-    for (j = 0; j < courseNums; j++)
-    {
+    for (int j = 0; j < courseNums; j++)
         printf("课程%d\t", j + 1);
-    }
     printf("总分\t\t平均分\n");
-    for (i = 0; i < stuNums; i++)
+    NODE *p = head;
+    while (p)
     {
-        printf("%-16ld\t%-16s\t", stu[i].num, stu[i].name);
-        for (j = 0; j < courseNums; j++)
-        {
-            printf("%16.1lf\t", stu[i].score[j]);
-        }
-        printf("%16.2lf\t%16.2lf\n", stu[i].sum, stu[i].aver);
+        printf("%-16ld\t%-16s\t", p->data.num, p->data.name);
+        for (int j = 0; j < courseNums; j++)
+            printf("%16.1lf\t", p->data.score[j]);
+        printf("%16.2lf\t%16.2lf\n", p->data.sum, p->data.aver);
+        p = p->next;
     }
 }
 
 // 将学生信息写入文件
-void WriteToFile(int stuNums, int courseNums, STU stu[])
+void WriteToFile(int stuNums, int courseNums, NODE *head)
 {
-    int i, j;
-    FILE *fp;
-    fp = fopen(DATA_FILE, "w");
+    FILE *fp = fopen(DATA_FILE, "w");
     if (fp == NULL)
     {
         printf("无法打开文件，写入失败！请检查当前目录是否可写。");
         return;
     }
-
     fprintf(fp, "%10ld%10ld\n", stuNums, courseNums);
-    for (i = 0; i < stuNums; i++)
+    NODE *p = head;
+    while (p)
     {
-        fprintf(fp, "%10ld%10s", stu[i].num, stu[i].name);
-        for (j = 0; j < courseNums; j++)
-        {
-            fprintf(fp, "%10.2f", stu[i].score[j]);
-        }
-        fprintf(fp, "%10.2f%10.2f\n", stu[i].sum, stu[i].aver);
+        fprintf(fp, "%10ld%10s", p->data.num, p->data.name);
+        for (int j = 0; j < courseNums; j++)
+            fprintf(fp, "%10.2f", p->data.score[j]);
+        fprintf(fp, "%10.2f%10.2f\n", p->data.sum, p->data.aver);
+        p = p->next;
     }
     fclose(fp);
     printf("学生信息已成功写入文件\n");
 }
 
 // 从文件读取学生信息
-int ReadFromFile(int *stuNums, int *courseNums, STU stu[], int *first)
+int ReadFromFile(int *stuNums, int *courseNums, NODE **head, int *first)
 {
-    FILE *fp;
-    int i, j;
-    int posy = 8;
-    SetPosition(POS_X1, posy);
-    if ((fp = fopen(DATA_FILE, "r")) == NULL)
+    FILE *fp = fopen(DATA_FILE, "r");
+    if (fp == NULL)
     {
         printf("无法打开文件，读取失败！请确认文件已存在。");
         return 1;
     }
     fscanf(fp, "%10ld%10ld", stuNums, courseNums);
-    for (i = 0; i < *stuNums; i++)
+    // 清空原有链表
+    FreeList(*head);
+    *head = NULL;
+    NODE *tail = NULL;
+    for (int i = 0; i < *stuNums; i++)
     {
-        fscanf(fp, "%10ld%10s", &stu[i].num, stu[i].name);
-        for (j = 0; j < *courseNums; j++)
+        NODE *newNode = (NODE *)malloc(sizeof(NODE));
+        if (!newNode)
         {
-            fscanf(fp, "%10f", &stu[i].score[j]);
+            printf("内存分配失败！\n");
+            exit(1);
         }
-        fscanf(fp, "%10f%10f", &stu[i].sum, &stu[i].aver);
+        fscanf(fp, "%10ld%10s", &newNode->data.num, newNode->data.name);
+        for (int j = 0; j < *courseNums; j++)
+            fscanf(fp, "%10f", &newNode->data.score[j]);
+        fscanf(fp, "%10f%10f", &newNode->data.sum, &newNode->data.aver);
+        newNode->next = NULL;
+        if (*head == NULL)
+        {
+            *head = newNode;
+            tail = newNode;
+        }
+        else
+        {
+            tail->next = newNode;
+            tail = newNode;
+        }
     }
     fclose(fp);
-    *first = 0; // 已经成功读取学生信息，设置标志变量为0
+    *first = 0;
     printf("学生信息已成功从文件读取\n");
     return 0;
+}
+
+// 释放链表内存
+void FreeList(NODE *head)
+{
+    NODE *p = head;
+    while (p)
+    {
+        NODE *next = p->next;
+        free(p);
+        p = next;
+    }
 }
